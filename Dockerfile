@@ -9,7 +9,28 @@ RUN cd /go/src/github.com/mendersoftware/create-artifact-worker && env CGO_ENABL
 
 FROM  mendersoftware/workflows:master
 RUN apk update && apk upgrade && \
-    apk add --no-cache ca-certificates 
+    apk add --no-cache \ 
+    ca-certificates \
+    xz \
+    binutils \
+    file \
+    rsync \
+    parted \
+    e2fsprogs \
+    xfsprogs \
+    pigz \
+    dosfstools \
+    wget \
+    make 
+    # bmap-tools not found
+
+RUN wget https://d1b0l86ne08fsf.cloudfront.net/mender-artifact/3.2.1/linux/mender-artifact -O /usr/bin/mender-artifact
+RUN chmod +x /usr/bin/mender-artifact
+
+RUN mkdir -p /usr/share/mender/modules/v3 && wget -N -P /usr/share/mender/modules/v3 https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file
+
+RUN wget https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen -O /usr/bin/single-file-artifact-gen
+RUN chmod +x /usr/bin/single-file-artifact-gen
 
 COPY ./config.yaml /etc/workflows
 COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin
