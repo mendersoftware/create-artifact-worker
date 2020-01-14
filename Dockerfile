@@ -21,8 +21,11 @@ RUN apk update && apk upgrade && \
     pigz \
     dosfstools \
     wget \
-    make 
+    make \ 
+    bash
     # bmap-tools not found
+
+RUN sed -i 's/ash/bash/g' /etc/passwd
 
 RUN wget https://d1b0l86ne08fsf.cloudfront.net/mender-artifact/3.2.1/linux/mender-artifact -O /usr/bin/mender-artifact
 RUN chmod +x /usr/bin/mender-artifact
