@@ -11,28 +11,26 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-package log
+package config
 
 import (
-	"log"
+	"github.com/spf13/viper"
 )
 
-var isVerbose bool
+const (
+	//translate to env vars: CREATE_ARTIFACT_<CAPITALIZED>
+	CfgServer     = "server"
+	CfgSkipVerify = "skipverify"
+	CfgVerbose    = "verbose"
+	CfgWorkDir    = "workdir"
+)
 
-func Init(verbose bool) {
-	isVerbose = verbose
-}
+func Init() {
+	viper.SetEnvPrefix("CREATE_ARTIFACT")
+	viper.AutomaticEnv()
 
-func Error(fmt string, args ...string) {
-	log.Printf("[ERROR] "+fmt, args)
-}
-
-func Info(fmt string, args ...string) {
-	log.Printf("[INFO] "+fmt, args)
-}
-
-func Verbose(fmt string, args ...string) {
-	if isVerbose {
-		log.Printf("[VERBOSE] "+fmt, args)
-	}
+	viper.SetDefault(CfgServer, "")
+	viper.SetDefault(CfgSkipVerify, false)
+	viper.SetDefault(CfgVerbose, false)
+	viper.SetDefault(CfgWorkDir, "/var")
 }

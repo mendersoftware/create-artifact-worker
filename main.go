@@ -13,5 +13,10 @@
 //    limitations under the License.
 package main
 
+import (
+	"github.com/mendersoftware/create-artifact-worker/cmd"
+)
+
 func main() {
+	cmd.Execute()
 }

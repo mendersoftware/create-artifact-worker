@@ -11,28 +11,35 @@
 //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
-package log
+package cmd
 
 import (
-	"log"
+	"os"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	"github.com/mendersoftware/create-artifact-worker/config"
+	mlog "github.com/mendersoftware/create-artifact-worker/log"
 )
 
-var isVerbose bool
-
-func Init(verbose bool) {
-	isVerbose = verbose
+var rootCmd = &cobra.Command{
+	Use:   "create-artifact",
+	Short: "Artifact generator CLI.",
+	Long: "\nSupports the following env vars:\n\n" +
+		"CREATE_ARTIFACT_VERBOSE enable verbose logging (default: false)\n",
 }
 
-func Error(fmt string, args ...string) {
-	log.Printf("[ERROR] "+fmt, args)
-}
-
-func Info(fmt string, args ...string) {
-	log.Printf("[INFO] "+fmt, args)
-}
-
-func Verbose(fmt string, args ...string) {
-	if isVerbose {
-		log.Printf("[VERBOSE] "+fmt, args)
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		mlog.Error(err.Error())
+		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.AddCommand(singleFileCmd)
+
+	config.Init()
+	mlog.Init(viper.GetBool(config.CfgVerbose))
 }
