@@ -19,10 +19,12 @@ import (
 
 const (
 	//translate to env vars: CREATE_ARTIFACT_<CAPITALIZED>
-	CfgServer     = "server"
-	CfgSkipVerify = "skipverify"
-	CfgVerbose    = "verbose"
-	CfgWorkDir    = "workdir"
+	CfgServer         = "server"
+	CfgSkipVerify     = "skipverify"
+	CfgVerbose        = "verbose"
+	CfgWorkDir        = "workdir"
+	CfgGatewayUrl     = "gateway_url"
+	CfgDeploymentsUrl = "deployments_url"
 )
 
 func Init() {

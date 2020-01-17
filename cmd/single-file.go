@@ -40,7 +40,9 @@ var singleFileCmd = &cobra.Command{
 	Long: "\nBesides command line args, supports the following env vars:\n\n" +
 		"CREATE_ARTIFACT_SERVER root server url (required)\n" +
 		"CREATE_ARTIFACT_SKIPVERIFY skip ssl verification (default: false)\n" +
-		"CREATE_ARTIFACT_WORKDIR working dir for processing (default: /var)\n",
+		"CREATE_ARTIFACT_WORKDIR working dir for processing (default: /var)\n" +
+		"CREATE_ARTIFACT_GATEWAY_URL public-facing gateway url\n" +
+		"CREATE_ARTIFACT_DEPLOYMENTS_URL internal deployments service url\n",
 	Run: func(cmd *cobra.Command, args []string) {
 		c, err := NewSingleFileCmd(cmd, args)
 		if err != nil {
