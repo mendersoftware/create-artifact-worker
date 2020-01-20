@@ -37,4 +37,4 @@ RUN chmod +x /usr/bin/single-file-artifact-gen
 
 COPY ./config.yaml /etc/workflows
 COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin
-ENTRYPOINT ["/usr/bin/workflows", "--worker", "--config", "/etc/workflows/config.yaml"]
+ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker"]
