@@ -1,0 +1,5 @@
+
+# Workflows path
+# The path where the workflows definitions are installed
+# Defaults to: "/etc/workflows/definitions"
+workflows_path: "/etc/workflows/definitions"
