@@ -14,7 +14,7 @@
 package cmd
 
 import (
-	"errors"
+	"encoding/json"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -22,6 +22,7 @@ import (
 
 	"github.com/mendersoftware/create-artifact-worker/config"
 	mlog "github.com/mendersoftware/create-artifact-worker/log"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -33,6 +34,11 @@ const (
 	argTenantId     = "tenant-id"
 	argArgs         = "args"
 )
+
+type args struct {
+	Filename string `json:"filename"`
+	DestDir  string `json:"dest_dir"`
+}
 
 var singleFileCmd = &cobra.Command{
 	Use:   "single-file",
@@ -82,14 +88,16 @@ func init() {
 }
 
 type SingleFileCmd struct {
-	Server     string
-	SkipVerify bool
-	Workdir    string
+	ServerUrl      string
+	DeploymentsUrl string
+	SkipVerify     bool
+	Workdir        string
 
 	ArtifactName string
 	Description  string
 	DeviceType   string
 	ArtifactId   string
+	Args         string
 	FileName     string
 	DestDir      string
 	TenantId     string
@@ -98,12 +106,7 @@ type SingleFileCmd struct {
 
 func NewSingleFileCmd(cmd *cobra.Command, args []string) (*SingleFileCmd, error) {
 	c := &SingleFileCmd{}
-
-	c.Server = viper.GetString(config.CfgServer)
-	c.SkipVerify = viper.GetBool(config.CfgSkipVerify)
-	c.Workdir = viper.GetString(config.CfgWorkDir)
-
-	// TODO: read other flags/env vars
+	c.init(cmd)
 
 	if err := c.Validate(); err != nil {
 		return nil, err
@@ -112,16 +115,85 @@ func NewSingleFileCmd(cmd *cobra.Command, args []string) (*SingleFileCmd, error)
 	return c, nil
 }
 
+func (c *SingleFileCmd) init(cmd *cobra.Command) error {
+	c.ServerUrl = viper.GetString(config.CfgServer)
+	c.DeploymentsUrl = viper.GetString(config.CfgDeploymentsUrl)
+	c.SkipVerify = viper.GetBool(config.CfgSkipVerify)
+	c.Workdir = viper.GetString(config.CfgWorkDir)
+	c.SkipVerify = viper.GetBool(config.CfgSkipVerify)
+
+	var arg string
+	arg, err := cmd.Flags().GetString(argArtifactName)
+	c.ArtifactName = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argDescription)
+	c.Description = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argDeviceType)
+	c.DeviceType = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argArtifactId)
+	c.ArtifactId = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argTenantId)
+	c.TenantId = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argToken)
+	c.AuthToken = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argArgs)
+	c.Args = arg
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *SingleFileCmd) Validate() error {
-	if c.Server == "" {
-		return errors.New("server address not provided")
+	if err := config.ValidUrl(c.ServerUrl); err != nil {
+		return errors.Wrap(err, "invalid gateway address")
 	}
 
-	if c.Workdir == "" {
-		return errors.New("working directory not provided")
+	if err := config.ValidAbsPath(c.Workdir); err != nil {
+		return errors.Wrap(err, "invalid workdir")
 	}
 
-	// TODO other validations, esp. 'args' (json doc)
+	var args args
+
+	err := json.Unmarshal([]byte(c.Args), &args)
+	if err != nil {
+		return errors.Wrap(err, "can't parse 'args'")
+	}
+
+	c.FileName = args.Filename
+	c.DestDir = args.DestDir
+
+	if c.FileName == "" {
+		return errors.New("destination filename can't be empty")
+	}
+
+	if err := config.ValidAbsPath(c.DestDir); err != nil {
+		return errors.Wrap(err, "invalid artifact destination dir")
+	}
 
 	return nil
 }
