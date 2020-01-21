@@ -35,6 +35,8 @@ RUN mkdir -p /usr/share/mender/modules/v3 && wget -N -P /usr/share/mender/module
 RUN wget https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen -O /usr/bin/single-file-artifact-gen
 RUN chmod +x /usr/bin/single-file-artifact-gen
 
+COPY ./workflows/single-file-artifact.json /etc/workflows/definitions/single-file-artifact.json
+
 COPY ./config.yaml /etc/workflows
 COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin
 ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker"]
