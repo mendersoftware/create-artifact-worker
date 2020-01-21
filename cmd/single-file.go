@@ -14,12 +14,17 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
+	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/mendersoftware/create-artifact-worker/client"
 	"github.com/mendersoftware/create-artifact-worker/config"
 	mlog "github.com/mendersoftware/create-artifact-worker/log"
 	"github.com/pkg/errors"
@@ -221,5 +226,61 @@ func (c *SingleFileCmd) Validate() error {
 }
 
 func (c *SingleFileCmd) Run() error {
+	mlog.Info("running single-file update module generation")
+
+	cd, err := client.NewDeployments(c.ServerUrl, c.DeploymentsUrl, c.SkipVerify)
+	if err != nil {
+		return errors.New("failed to configure 'deployments' client")
+	}
+
+	cs3 := client.NewStorage()
+
+	ctx := context.Background()
+
+	downloadDir, err := ioutil.TempDir(c.Workdir, "single-file")
+
+	//gotcha: must download under the correct name (destination name on the device)
+	//artifact generator will not allow renaming it
+	downloadFile := filepath.Join(downloadDir, c.FileName)
+
+	err = cs3.Download(ctx, c.GetArtifactUri, downloadFile)
+	if err != nil {
+		return errors.Wrapf(err, "failed to download input file at %s", c.GetArtifactUri)
+	}
+
+	// make the filename unique by naming it after the artifact
+	outfile := c.ArtifactId + "-generated"
+	outfile = filepath.Join(downloadDir, outfile)
+
+	// run gen script
+	cmd := exec.Command(
+		"/usr/bin/single-file-artifact-gen",
+		"-n", c.ArtifactName,
+		"-t", c.DeviceType,
+		"-d", c.DestDir,
+		"-o", outfile,
+		downloadFile,
+	)
+
+	std, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.Wrapf(err, "single-file-artifact-gen exited with error %s", std)
+	}
+
+	err = cs3.Delete(ctx, c.DelArtifactUri)
+	if err != nil {
+		return errors.Wrapf(err, "failed to delete artifact at %s", c.DelArtifactUri)
+	}
+
+	err = cd.UploadArtifactInternal(ctx, outfile, c.ArtifactId, c.TenantId, c.Description)
+	if err != nil {
+		return errors.Wrapf(err, "failed to upload generated artifact")
+	}
+
+	err = os.RemoveAll(downloadDir)
+	if err != nil {
+		mlog.Error("failed to remove temp working dir %s: %v", downloadDir, err.Error())
+	}
+
 	return nil
 }
