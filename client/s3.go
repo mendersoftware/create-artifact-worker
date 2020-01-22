@@ -56,6 +56,22 @@ func (s *storage) Download(ctx context.Context, url, path string) error {
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != http.StatusOK {
+		var body string
+
+		bbody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			body = "<failed to read body>"
+		} else {
+			body = string(bbody)
+		}
+
+		return errors.New(fmt.Sprintf("failed to download artifact at url %s, http %d, response: \n %s",
+			url,
+			res.StatusCode,
+			body))
+	}
+
 	out, err := os.Create(path)
 	if err != nil {
 		return err
