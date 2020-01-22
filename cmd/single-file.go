@@ -26,13 +26,15 @@ import (
 )
 
 const (
-	argToken        = "token"
-	argArtifactName = "artifact-name"
-	argDescription  = "description"
-	argDeviceType   = "device-type"
-	argArtifactId   = "artifact-id"
-	argTenantId     = "tenant-id"
-	argArgs         = "args"
+	argToken          = "token"
+	argArtifactName   = "artifact-name"
+	argDescription    = "description"
+	argDeviceType     = "device-type"
+	argArtifactId     = "artifact-id"
+	argGetArtifactUri = "get-artifact-uri"
+	argDelArtifactUri = "delete-artifact-uri"
+	argTenantId       = "tenant-id"
+	argArgs           = "args"
 )
 
 type args struct {
@@ -74,6 +76,12 @@ func init() {
 	singleFileCmd.Flags().String(argArtifactId, "", "artifact id")
 	singleFileCmd.MarkFlagRequired(argArtifactId)
 
+	singleFileCmd.Flags().String(argGetArtifactUri, "", "pre-signed s3 url to uploaded temp artifact (GET)")
+	singleFileCmd.MarkFlagRequired(argGetArtifactUri)
+
+	singleFileCmd.Flags().String(argDelArtifactUri, "", "pre-signed s3 url to uploaded temp artifact (DELETE)")
+	singleFileCmd.MarkFlagRequired(argDelArtifactUri)
+
 	singleFileCmd.Flags().String(argTenantId, "", "tenant id")
 	singleFileCmd.MarkFlagRequired(argTenantId)
 
@@ -93,15 +101,17 @@ type SingleFileCmd struct {
 	SkipVerify     bool
 	Workdir        string
 
-	ArtifactName string
-	Description  string
-	DeviceType   string
-	ArtifactId   string
-	Args         string
-	FileName     string
-	DestDir      string
-	TenantId     string
-	AuthToken    string
+	ArtifactName   string
+	Description    string
+	DeviceType     string
+	ArtifactId     string
+	GetArtifactUri string
+	DelArtifactUri string
+	Args           string
+	FileName       string
+	DestDir        string
+	TenantId       string
+	AuthToken      string
 }
 
 func NewSingleFileCmd(cmd *cobra.Command, args []string) (*SingleFileCmd, error) {
@@ -143,6 +153,18 @@ func (c *SingleFileCmd) init(cmd *cobra.Command) error {
 
 	arg, err = cmd.Flags().GetString(argArtifactId)
 	c.ArtifactId = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argGetArtifactUri)
+	c.GetArtifactUri = arg
+	if err != nil {
+		return err
+	}
+
+	arg, err = cmd.Flags().GetString(argDelArtifactUri)
+	c.DelArtifactUri = arg
 	if err != nil {
 		return err
 	}
