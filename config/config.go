@@ -14,6 +14,7 @@
 package config
 
 import (
+	"fmt"
 	"net/url"
 	"path/filepath"
 
@@ -60,4 +61,18 @@ func ValidAbsPath(s string) error {
 	}
 
 	return nil
+}
+
+func Dump() string {
+	return dump(CfgServer) +
+		dump(CfgSkipVerify) +
+		dump(CfgVerbose) +
+		dump(CfgWorkDir) +
+		dump(CfgDeploymentsUrl) +
+		dump(CfgGatewayUrl) +
+		dump(CfgDeploymentsUrl)
+}
+
+func dump(n string) string {
+	return fmt.Sprintf("%s: %v\n", n, viper.Get(n))
 }

@@ -16,6 +16,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -226,7 +227,8 @@ func (c *SingleFileCmd) Validate() error {
 }
 
 func (c *SingleFileCmd) Run() error {
-	mlog.Info("running single-file update module generation")
+	mlog.Info("running single-file update module generation:\n%s", c.dumpArgs())
+	mlog.Info("config:\n%s", config.Dump())
 
 	cd, err := client.NewDeployments(c.ServerUrl, c.DeploymentsUrl, c.SkipVerify)
 	if err != nil {
@@ -237,11 +239,18 @@ func (c *SingleFileCmd) Run() error {
 
 	ctx := context.Background()
 
+	mlog.Verbose("creating temp dir at", c.Workdir)
+
 	downloadDir, err := ioutil.TempDir(c.Workdir, "single-file")
+	if err != nil {
+		return errors.Wrapf(err, "failed to create temp dir under workdir %s", c.Workdir)
+	}
 
 	//gotcha: must download under the correct name (destination name on the device)
 	//artifact generator will not allow renaming it
 	downloadFile := filepath.Join(downloadDir, c.FileName)
+
+	mlog.Verbose("downloading temp artifact to %s", downloadFile)
 
 	err = cs3.Download(ctx, c.GetArtifactUri, downloadFile)
 	if err != nil {
@@ -251,6 +260,8 @@ func (c *SingleFileCmd) Run() error {
 	// make the filename unique by naming it after the artifact
 	outfile := c.ArtifactId + "-generated"
 	outfile = filepath.Join(downloadDir, outfile)
+
+	mlog.Verbose("generating output artifact %s", outfile)
 
 	// run gen script
 	cmd := exec.Command(
@@ -263,15 +274,19 @@ func (c *SingleFileCmd) Run() error {
 	)
 
 	std, err := cmd.CombinedOutput()
+	mlog.Info(string(std))
 	if err != nil {
 		return errors.Wrapf(err, "single-file-artifact-gen exited with error %s", std)
 	}
+
+	mlog.Verbose("deleting temp file from S3")
 
 	err = cs3.Delete(ctx, c.DelArtifactUri)
 	if err != nil {
 		return errors.Wrapf(err, "failed to delete artifact at %s", c.DelArtifactUri)
 	}
 
+	mlog.Verbose("uploading generated artifact")
 	err = cd.UploadArtifactInternal(ctx, outfile, c.ArtifactId, c.TenantId, c.Description)
 	if err != nil {
 		return errors.Wrapf(err, "failed to upload generated artifact")
@@ -283,4 +298,19 @@ func (c *SingleFileCmd) Run() error {
 	}
 
 	return nil
+}
+
+func (c *SingleFileCmd) dumpArgs() string {
+	return dumpArg(argArtifactName, c.ArtifactName) +
+		dumpArg(argDescription, c.Description) +
+		dumpArg(argArtifactId, c.ArtifactId) +
+		dumpArg(argDeviceType, c.DeviceType) +
+		dumpArg(argTenantId, c.TenantId) +
+		dumpArg(argGetArtifactUri, c.GetArtifactUri) +
+		dumpArg(argDelArtifactUri, c.DelArtifactUri) +
+		dumpArg(argArgs, c.Args)
+}
+
+func dumpArg(n, v string) string {
+	return fmt.Sprintf("--%s: %s\n", n, v)
 }
