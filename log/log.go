@@ -24,15 +24,15 @@ func Init(verbose bool) {
 }
 
 func Error(fmt string, args ...string) {
-	log.Printf("[ERROR] "+fmt, args)
+	log.Printf("ERROR "+fmt+"\n", args)
 }
 
 func Info(fmt string, args ...string) {
-	log.Printf("[INFO] "+fmt, args)
+	log.Printf(fmt+"\n", args)
 }
 
 func Verbose(fmt string, args ...string) {
 	if isVerbose {
-		log.Printf("[VERBOSE] "+fmt, args)
+		log.Printf(" -- "+fmt+"\n", args)
 	}
 }

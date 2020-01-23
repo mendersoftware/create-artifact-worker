@@ -44,7 +44,7 @@ var (
 type Deployments interface {
 	GetArtifactLink(ctx context.Context, id, tok string) (string, error)
 	DeleteArtifact(ctx context.Context, id, tok string) error
-	UploadArtifactInteral(ctx context.Context, path, aid, tid, desc string) error
+	UploadArtifactInternal(ctx context.Context, path, aid, tid, desc string) error
 }
 
 type deployments struct {
@@ -138,7 +138,7 @@ func (d *deployments) DeleteArtifact(ctx context.Context, id, tok string) error 
 	return nil
 }
 
-func (d *deployments) UploadArtifactInteral(ctx context.Context, fpath, aid, tid, desc string) error {
+func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, tid, desc string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
 	defer cancel()
 

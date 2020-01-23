@@ -14,6 +14,11 @@
 package config
 
 import (
+	"fmt"
+	"net/url"
+	"path/filepath"
+
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
@@ -35,4 +40,39 @@ func Init() {
 	viper.SetDefault(CfgSkipVerify, false)
 	viper.SetDefault(CfgVerbose, false)
 	viper.SetDefault(CfgWorkDir, "/var")
+}
+
+func ValidUrl(s string) error {
+	u, err := url.Parse(s)
+	if err != nil {
+		return err
+	}
+
+	if u.Host == "" || u.Scheme == "" {
+		return errors.New("url needs scheme and host at a minimum")
+	}
+
+	return nil
+}
+
+func ValidAbsPath(s string) error {
+	if !filepath.IsAbs(s) {
+		return errors.New("need an absolute path")
+	}
+
+	return nil
+}
+
+func Dump() string {
+	return dump(CfgServer) +
+		dump(CfgSkipVerify) +
+		dump(CfgVerbose) +
+		dump(CfgWorkDir) +
+		dump(CfgDeploymentsUrl) +
+		dump(CfgGatewayUrl) +
+		dump(CfgDeploymentsUrl)
+}
+
+func dump(n string) string {
+	return fmt.Sprintf("%s: %v\n", n, viper.Get(n))
 }

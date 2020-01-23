@@ -15,13 +15,18 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 type Storage interface {
 	Download(ctx context.Context, url, path string) error
+	Delete(ctx context.Context, url string) error
 }
 
 type storage struct {
@@ -51,6 +56,22 @@ func (s *storage) Download(ctx context.Context, url, path string) error {
 	}
 	defer res.Body.Close()
 
+	if res.StatusCode != http.StatusOK {
+		var body string
+
+		bbody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			body = "<failed to read body>"
+		} else {
+			body = string(bbody)
+		}
+
+		return errors.New(fmt.Sprintf("failed to download artifact at url %s, http %d, response: \n %s",
+			url,
+			res.StatusCode,
+			body))
+	}
+
 	out, err := os.Create(path)
 	if err != nil {
 		return err
@@ -59,4 +80,39 @@ func (s *storage) Download(ctx context.Context, url, path string) error {
 
 	_, err = io.Copy(out, res.Body)
 	return err
+}
+
+func (s *storage) Delete(ctx context.Context, url string) error {
+	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
+	defer cancel()
+
+	req, err := http.NewRequest(http.MethodDelete,
+		url,
+		nil)
+
+	req = req.WithContext(ctx)
+
+	res, err := s.c.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		var body string
+
+		bbody, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			body = "<failed to read body>"
+		} else {
+			body = string(bbody)
+		}
+
+		return errors.New(fmt.Sprintf("failed to delete artifact at url %s, http %d, response: \n %s",
+			url,
+			res.StatusCode,
+			body))
+	}
+
+	return nil
 }
