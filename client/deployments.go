@@ -32,8 +32,6 @@ import (
 )
 
 const (
-	uriMgmtArtifact   = "/api/management/v1/deployments/artifacts/{id}"
-	uriMgmtLink       = uriMgmtArtifact + "/download"
 	uriInternalUpload = "/api/management/v1/deployments/tenants/{id}/artifacts"
 )
 
@@ -42,18 +40,15 @@ var (
 )
 
 type Deployments interface {
-	GetArtifactLink(ctx context.Context, id, tok string) (string, error)
-	DeleteArtifact(ctx context.Context, id, tok string) error
 	UploadArtifactInternal(ctx context.Context, path, aid, tid, desc string) error
 }
 
 type deployments struct {
-	gatewayUrl string
-	deplUrl    string
-	c          *http.Client
+	deplUrl string
+	c       *http.Client
 }
 
-func NewDeployments(gatewayUrl, deplUrl string, skipSsl bool) (Deployments, error) {
+func NewDeployments(deplUrl string, skipSsl bool) (Deployments, error) {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: skipSsl,
@@ -65,77 +60,9 @@ func NewDeployments(gatewayUrl, deplUrl string, skipSsl bool) (Deployments, erro
 	}
 
 	return &deployments{
-		gatewayUrl: gatewayUrl,
-		deplUrl:    deplUrl,
-		c:          c,
+		deplUrl: deplUrl,
+		c:       c,
 	}, nil
-}
-
-func (d *deployments) GetArtifactLink(ctx context.Context, id, tok string) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
-	defer cancel()
-
-	req, err := http.NewRequest(http.MethodGet,
-		path.Join(d.gatewayUrl, strings.Replace(uriMgmtLink, "{id}", id, 1)),
-		nil)
-	if err != nil {
-		return "", err
-	}
-
-	req = req.WithContext(ctx)
-
-	req.Header.Set("Authorization", "Bearer "+tok)
-
-	res, err := d.c.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return "", errors.Wrapf(apiErr(res), "failed to get link for artifact %s", id)
-	}
-
-	s := struct {
-		uri    string
-		expire string
-	}{}
-
-	err = json.NewDecoder(req.Body).Decode(&s)
-	if err != nil {
-		return "", errors.Wrapf(err, "failed to decode artifact link for artifact %s", id)
-	}
-
-	return s.uri, nil
-
-}
-
-func (d *deployments) DeleteArtifact(ctx context.Context, id, tok string) error {
-	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
-	defer cancel()
-
-	req, err := http.NewRequest(http.MethodDelete,
-		path.Join(d.gatewayUrl, strings.Replace(uriMgmtArtifact, "{id}", id, 1)),
-		nil)
-	if err != nil {
-		return err
-	}
-
-	req = req.WithContext(ctx)
-
-	req.Header.Set("Authorization", "Bearer "+tok)
-
-	res, err := d.c.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		return errors.Wrapf(apiErr(res), "failed to delete artifact %s", id)
-	}
-
-	return nil
 }
 
 func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, tid, desc string) error {
