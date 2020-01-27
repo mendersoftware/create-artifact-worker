@@ -52,10 +52,8 @@ var singleFileCmd = &cobra.Command{
 	Use:   "single-file",
 	Short: "Generate an update using a single-file update module.",
 	Long: "\nBesides command line args, supports the following env vars:\n\n" +
-		"CREATE_ARTIFACT_SERVER root server url (required)\n" +
 		"CREATE_ARTIFACT_SKIPVERIFY skip ssl verification (default: false)\n" +
 		"CREATE_ARTIFACT_WORKDIR working dir for processing (default: /var)\n" +
-		"CREATE_ARTIFACT_GATEWAY_URL public-facing gateway url\n" +
 		"CREATE_ARTIFACT_DEPLOYMENTS_URL internal deployments service url\n",
 	Run: func(cmd *cobra.Command, args []string) {
 		c, err := NewSingleFileCmd(cmd, args)
@@ -132,7 +130,6 @@ func NewSingleFileCmd(cmd *cobra.Command, args []string) (*SingleFileCmd, error)
 }
 
 func (c *SingleFileCmd) init(cmd *cobra.Command) error {
-	c.ServerUrl = viper.GetString(config.CfgServer)
 	c.DeploymentsUrl = viper.GetString(config.CfgDeploymentsUrl)
 	c.SkipVerify = viper.GetBool(config.CfgSkipVerify)
 	c.Workdir = viper.GetString(config.CfgWorkDir)
@@ -197,10 +194,6 @@ func (c *SingleFileCmd) init(cmd *cobra.Command) error {
 }
 
 func (c *SingleFileCmd) Validate() error {
-	if err := config.ValidUrl(c.ServerUrl); err != nil {
-		return errors.Wrap(err, "invalid gateway address")
-	}
-
 	if err := config.ValidAbsPath(c.Workdir); err != nil {
 		return errors.Wrap(err, "invalid workdir")
 	}
@@ -230,7 +223,7 @@ func (c *SingleFileCmd) Run() error {
 	mlog.Info("running single-file update module generation:\n%s", c.dumpArgs())
 	mlog.Info("config:\n%s", config.Dump())
 
-	cd, err := client.NewDeployments(c.ServerUrl, c.DeploymentsUrl, c.SkipVerify)
+	cd, err := client.NewDeployments(c.DeploymentsUrl, c.SkipVerify)
 	if err != nil {
 		return errors.New("failed to configure 'deployments' client")
 	}

@@ -24,7 +24,6 @@ import (
 
 const (
 	//translate to env vars: CREATE_ARTIFACT_<CAPITALIZED>
-	CfgServer         = "server"
 	CfgSkipVerify     = "skipverify"
 	CfgVerbose        = "verbose"
 	CfgWorkDir        = "workdir"
@@ -36,7 +35,6 @@ func Init() {
 	viper.SetEnvPrefix("CREATE_ARTIFACT")
 	viper.AutomaticEnv()
 
-	viper.SetDefault(CfgServer, "")
 	viper.SetDefault(CfgSkipVerify, false)
 	viper.SetDefault(CfgVerbose, false)
 	viper.SetDefault(CfgWorkDir, "/var")
@@ -64,8 +62,7 @@ func ValidAbsPath(s string) error {
 }
 
 func Dump() string {
-	return dump(CfgServer) +
-		dump(CfgSkipVerify) +
+	return dump(CfgSkipVerify) +
 		dump(CfgVerbose) +
 		dump(CfgWorkDir) +
 		dump(CfgDeploymentsUrl) +
