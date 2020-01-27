@@ -87,6 +87,11 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 
 	_, err = io.Copy(part, artifact)
 
+	err = writer.Close()
+	if err != nil {
+		return errors.Wrap(err, "cannot create artifact upload request")
+	}
+
 	req, err := http.NewRequest(http.MethodPost,
 		path.Join(d.deplUrl, strings.Replace(uriInternalUpload, "{id}", tid, 1)),
 		body)
