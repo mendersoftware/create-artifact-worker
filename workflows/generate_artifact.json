@@ -1,5 +1,5 @@
 {
-    "name": "Single-file updates workflow",
+    "name": "generate_artifact",
     "description": "Runs a single CLI command -- An invocation of the create_artifact CLI",
     "version": 1,
     "tasks": [
@@ -8,31 +8,31 @@
             "type": "cli",
             "cli": {
                 "command": [
-                    "create-artifact-worker",
+                    "create-artifact",
                     "single-file",
                     "--artifact-id", "${workflow.input.artifact_id}",
-                    "--artifact-name", "${workflow.input.artifact_name}",
+                    "--artifact-name", "${workflow.input.name}",
                     "--delete-artifact-uri", "${workflow.input.delete_artifact_uri}",
                     "--description", "${workflow.input.description}",
-                    "--device-type", "${workflow.input.device_type}",
+                    "--device-type", "${workflow.input.device_types_compatible}",
                     "--get-artifact-uri", "${workflow.input.get_artifact_uri}",
                     "--tenant-id", "${workflow.input.tenant_id}",
                     "--token", "${workflow.input.token}",
-                    "--args", "${workflow.input.args}",
+                    "--args", "${workflow.input.args}"
                 ],
-                "executionTimeOut": 100,
+                "executionTimeOut": 3600
             }
         }
     ],
     "inputParameters": [
         "artifact_id",
-        "artifact_name",
+        "name",
         "delete_artifact_uri",
         "description",
-        "device_type",
+        "device_types_compatible",
         "get_artifact_uri",
         "tenant_id",
         "token",
-        "args",
-    ],
+        "args"
+    ]
 }
