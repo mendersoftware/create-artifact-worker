@@ -228,7 +228,7 @@ func (c *SingleFileCmd) Run() error {
 		return errors.New("failed to configure 'deployments' client")
 	}
 
-	cs3 := client.NewStorage()
+	cs3 := client.NewStorage(c.SkipVerify)
 
 	ctx := context.Background()
 

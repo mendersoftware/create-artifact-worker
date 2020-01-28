@@ -23,7 +23,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -32,7 +31,7 @@ import (
 )
 
 const (
-	uriInternalUpload = "/api/management/v1/deployments/tenants/{id}/artifacts"
+	uriInternalUpload = "/api/internal/v1/deployments/tenants/{id}/artifacts"
 )
 
 var (
@@ -86,9 +85,17 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 	part, err := writer.CreateFormFile("artifact", filepath.Base(fpath))
 
 	_, err = io.Copy(part, artifact)
+	if err != nil {
+		return errors.Wrap(err, "cannot create artifact upload request")
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return errors.Wrap(err, "cannot create artifact upload request")
+	}
 
 	req, err := http.NewRequest(http.MethodPost,
-		path.Join(d.deplUrl, strings.Replace(uriInternalUpload, "{id}", tid, 1)),
+		d.deplUrl+strings.Replace(uriInternalUpload, "{id}", tid, 1),
 		body)
 	if err != nil {
 		return errors.Wrap(err, "cannot create artifact upload request")
@@ -99,6 +106,9 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	res, err := d.c.Do(req)
+	if err != nil {
+		return errors.Wrapf(err, "failed to upload artifact %s", aid)
+	}
 
 	if res.StatusCode != http.StatusCreated {
 		return errors.Wrapf(apiErr(res), "failed to upload artifact %s", aid)
