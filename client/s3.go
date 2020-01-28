@@ -15,6 +15,7 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -33,8 +34,17 @@ type storage struct {
 	c *http.Client
 }
 
-func NewStorage() Storage {
-	c := &http.Client{}
+func NewStorage(skipSsl bool) Storage {
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: skipSsl,
+		},
+	}
+
+	c := &http.Client{
+		Transport: tr,
+	}
+
 	return &storage{
 		c: c,
 	}
@@ -98,7 +108,7 @@ func (s *storage) Delete(ctx context.Context, url string) error {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusOK {
+	if res.StatusCode != http.StatusNoContent {
 		var body string
 
 		bbody, err := ioutil.ReadAll(res.Body)
