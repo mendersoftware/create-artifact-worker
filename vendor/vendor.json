@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "CSPbwbyzqA6sfORicn4HFtIhF/c=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "d8f796af33cc11cb798c1aaeb27a4ebc5099927d",
+			"revisionTime": "2018-08-30T19:11:22Z"
+		},
+		{
 			"checksumSHA1": "ek05bLURic4T9fEd9iE048jQzYw=",
 			"path": "github.com/fsnotify/fsnotify",
 			"revision": "4bf2d1fec78374803a39307bfb8d340688f4f28e",
@@ -111,6 +117,12 @@
 			"revisionTime": "2020-01-14T19:47:44Z"
 		},
 		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "5d4384ee4fb2527b0a1256a821ebfc92f91efefc",
+			"revisionTime": "2018-12-26T10:54:42Z"
+		},
+		{
 			"checksumSHA1": "2d0rR/VhqllUdrcH6kwHHrhqJ2E=",
 			"path": "github.com/spf13/afero",
 			"revision": "588a75ec4f32903aa5e39a2619ba6a4631e28424",
@@ -169,6 +181,12 @@
 			"path": "github.com/spf13/viper",
 			"revision": "06ab5a4b62072ad7af49cf178f79d83aaf3e9d92",
 			"revisionTime": "2020-01-08T09:55:18Z"
+		},
+		{
+			"checksumSHA1": "mCZlyemHWuVUdQpnAk7fOzOKLIA=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "ea72eb91592e90d15a9e03ffe61f02493135d843",
+			"revisionTime": "2020-01-28T21:23:57Z"
 		},
 		{
 			"checksumSHA1": "MZ4JU44HUXZ4JB+oxYrw9wpaOZU=",
