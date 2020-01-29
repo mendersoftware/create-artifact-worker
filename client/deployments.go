@@ -94,6 +94,10 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 		return errors.Wrap(err, "cannot create artifact upload request")
 	}
 
+	if tid == "" {
+		tid = "default"
+	}
+
 	req, err := http.NewRequest(http.MethodPost,
 		d.deplUrl+strings.Replace(uriInternalUpload, "{id}", tid, 1),
 		body)
@@ -115,7 +119,6 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 	}
 
 	return nil
-
 }
 
 func apiErr(r *http.Response) error {
