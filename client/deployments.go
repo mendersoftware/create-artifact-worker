@@ -136,5 +136,5 @@ func apiErr(r *http.Response) error {
 		return errors.New(fmt.Sprintf("got error code %d from api but failed to decode response", r.StatusCode))
 	}
 
-	return errors.New(fmt.Sprintf("http %s reqid %d msg %s ", e.Reqid, r.StatusCode, e.Msg))
+	return errors.New(fmt.Sprintf("http %d, reqid: %s, msg: %s", r.StatusCode, e.Reqid, e.Msg))
 }
