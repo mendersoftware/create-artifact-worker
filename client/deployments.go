@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -98,8 +97,13 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 		tid = "default"
 	}
 
+	url, err := join(d.deplUrl, uriInternalUpload, map[string]string{"id": tid})
+	if err != nil {
+		return err
+	}
+
 	req, err := http.NewRequest(http.MethodPost,
-		d.deplUrl+strings.Replace(uriInternalUpload, "{id}", tid, 1),
+		url,
 		body)
 	if err != nil {
 		return errors.Wrap(err, "cannot create artifact upload request")
