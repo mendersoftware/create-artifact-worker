@@ -40,4 +40,4 @@ COPY ./workflows/generate_artifact.json /etc/workflows/definitions/generate_arti
 
 COPY ./config.yaml /etc/workflows
 COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin
-ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker"]
+ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker", "--workflows", "generate_artifact"]
