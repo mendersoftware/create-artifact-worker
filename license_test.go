@@ -16,10 +16,9 @@ package main
 
 import (
 	mt "github.com/mendersoftware/mendertesting"
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestLicenses(t *testing.T) {
-	assert.NoError(t, mt.CheckMenderCompliance(t))
+	mt.CheckMenderCompliance(t)
 }
