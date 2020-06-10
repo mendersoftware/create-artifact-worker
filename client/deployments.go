@@ -34,7 +34,7 @@ const (
 )
 
 var (
-	timeoutSec = 5 * time.Second
+	timeoutSec = 900 * time.Second
 )
 
 type Deployments interface {
