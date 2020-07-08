@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+ "strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -256,14 +257,40 @@ func (c *SingleFileCmd) Run() error {
 
 	mlog.Verbose("generating output artifact %s", outfile)
 
-	// run gen script
-	cmd := exec.Command(
-		"/usr/bin/single-file-artifact-gen",
-		"-n", c.ArtifactName,
-		"-t", c.DeviceType,
+	deviceTypes := strings.Split(c.DeviceType, ",")
+	/*  the artifactGenArguments array length comes from:
+	    "-n", c.ArtifactName,
 		"-d", c.DestDir,
 		"-o", outfile,
 		downloadFile,
+	*/
+	artifactGenArguments := make([]string, 2*len(deviceTypes)+2*3+1)
+	for i, t := range deviceTypes {
+		artifactGenArguments[i] = "-t"
+		i++
+		artifactGenArguments[i] = t
+	}
+	i:=2*len(deviceTypes)
+	artifactGenArguments[i] = "-n"
+	i++
+	artifactGenArguments[i] = c.ArtifactName
+
+	i++
+	artifactGenArguments[i] = "-d"
+	i++
+	artifactGenArguments[i] = c.DestDir
+
+	i++
+	artifactGenArguments[i] = "-o"
+	i++
+	artifactGenArguments[i] = outfile
+
+	i++
+	artifactGenArguments[i] = downloadFile
+	// run gen script
+	cmd := exec.Command(
+		"/usr/bin/single-file-artifact-gen",
+		artifactGenArguments...,
 	)
 
 	std, err := cmd.CombinedOutput()
