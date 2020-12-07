@@ -17,9 +17,6 @@ github.com/hashicorp/hcl/json/token
 github.com/inconshreveable/mousetrap
 # github.com/magiconair/properties v1.8.1
 github.com/magiconair/properties
-# github.com/mendersoftware/mendertesting v0.0.1
-## explicit
-github.com/mendersoftware/mendertesting
 # github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/pelletier/go-toml v1.2.0
