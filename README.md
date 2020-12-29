@@ -1,5 +1,5 @@
 [![Build Status](https://gitlab.com/Northern.tech/Mender/create-artifact-worker/badges/master/pipeline.svg)](https://gitlab.com/Northern.tech/Mender/create-artifact-worker/pipelines)
-[![codecov](https://codecov.io/gh/mendersoftware/create-artifact-worker/branch/master/graph/badge.svg)](https://codecov.io/gh/mendersoftware/create-artifact-worker)
+[![Coverage Status](https://coveralls.io/repos/github/mendersoftware/create-artifact-worker/badge.svg?branch=master)](https://coveralls.io/github/mendersoftware/create-artifact-worker?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mendersoftware/create-artifact-worker)](https://goreportcard.com/report/github.com/mendersoftware/create-artifact-worker)
 [![Docker pulls](https://img.shields.io/docker/pulls/mendersoftware/create-artifact-worker.svg?maxAge=3600)](https://hub.docker.com/r/mendersoftware/create-artifact-worker.svg/)
 
