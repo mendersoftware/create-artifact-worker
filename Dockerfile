@@ -28,7 +28,7 @@ RUN apk update && apk upgrade && \
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
 
-RUN wget https://d1b0l86ne08fsf.cloudfront.net/mender-artifact/3.2.1/linux/mender-artifact -O /usr/bin/mender-artifact
+RUN wget https://d1b0l86ne08fsf.cloudfront.net/mender-artifact/3.5.0/linux/mender-artifact -O /usr/bin/mender-artifact
 RUN chmod +x /usr/bin/mender-artifact
 
 RUN mkdir -p /usr/share/mender/modules/v3 && wget -N -P /usr/share/mender/modules/v3 https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file
