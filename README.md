@@ -16,7 +16,7 @@ and comprises several repositories.
 
 The Artifact Worker performs asynchronous server-side artifact generation upon user's request.
 
-![Mender logo](https://hosted.mender.io/ui/assets/img/loginlogo.png)
+![Mender logo](https://raw.githubusercontent.com/mendersoftware/mender/master/mender_logo.png)
 
 ## Getting started
 
