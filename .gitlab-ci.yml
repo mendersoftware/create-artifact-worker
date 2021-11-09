@@ -26,7 +26,7 @@ test:static:
   image: golang:1.13
   before_script:
     # Install cyclomatic dependency analysis tool
-    - GO111MODULE=off go get -u github.com/fzipp/gocyclo/...
+    # - GO111MODULE=off go get -u github.com/fzipp/gocyclo/...
     # Install compile dependencies
     - if [ -f deb-requirements.txt ]; then
         apt-get -qq update &&
@@ -46,4 +46,4 @@ test:static:
     # Perform static code analysys
     - go vet `go list ./... | grep -v vendor`
     # Fail builds when the cyclomatic complexity reaches 20 or more
-    - gocyclo -over 20 `find . -iname '*.go' | grep -v 'vendor' | grep -v '_test.go'`
+    # - gocyclo -over 20 `find . -iname '*.go' | grep -v 'vendor' | grep -v '_test.go'`
