@@ -18,6 +18,9 @@ include:
 test:unit:
   image: golang:1.13
 
+publish:unittests:
+  image: golang:1.13-alpine3.12
+
 test:static:
   stage: test
   needs: []
