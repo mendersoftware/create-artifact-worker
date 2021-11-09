@@ -7,7 +7,7 @@ RUN mkdir -p /go/src/github.com/mendersoftware/create-artifact-worker
 COPY . /go/src/github.com/mendersoftware/create-artifact-worker
 RUN cd /go/src/github.com/mendersoftware/create-artifact-worker && env CGO_ENABLED=1 go build -o create-artifact
 
-FROM  mendersoftware/workflows:master
+FROM  mendersoftware/workflows:mender-3.1.x
 RUN apk update && apk upgrade && \
     apk add --no-cache \ 
     ca-certificates \
