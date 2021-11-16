@@ -1,4 +1,4 @@
-// Copyright 2020 Northern.tech AS
+// Copyright 2021 Northern.tech AS
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/mendersoftware/create-artifact-worker/client"
 	"github.com/mendersoftware/create-artifact-worker/config"
 	mlog "github.com/mendersoftware/create-artifact-worker/log"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -73,29 +73,42 @@ var singleFileCmd = &cobra.Command{
 
 func init() {
 	singleFileCmd.Flags().String(argToken, "", "auth token")
-	singleFileCmd.MarkFlagRequired(argToken)
+	_ = singleFileCmd.MarkFlagRequired(argToken)
 
 	singleFileCmd.Flags().String(argArtifactName, "", "artifact name")
-	singleFileCmd.MarkFlagRequired(argArtifactName)
+	_ = singleFileCmd.MarkFlagRequired(argArtifactName)
 
 	singleFileCmd.Flags().String(argArtifactId, "", "artifact id")
-	singleFileCmd.MarkFlagRequired(argArtifactId)
+	_ = singleFileCmd.MarkFlagRequired(argArtifactId)
 
-	singleFileCmd.Flags().String(argGetArtifactUri, "", "pre-signed s3 url to uploaded temp artifact (GET)")
-	singleFileCmd.MarkFlagRequired(argGetArtifactUri)
+	singleFileCmd.Flags().String(
+		argGetArtifactUri,
+		"",
+		"pre-signed s3 url to uploaded temp artifact (GET)",
+	)
+	_ = singleFileCmd.MarkFlagRequired(argGetArtifactUri)
 
-	singleFileCmd.Flags().String(argDelArtifactUri, "", "pre-signed s3 url to uploaded temp artifact (DELETE)")
-	singleFileCmd.MarkFlagRequired(argDelArtifactUri)
+	singleFileCmd.Flags().String(
+		argDelArtifactUri,
+		"",
+		"pre-signed s3 url to uploaded temp artifact (DELETE)",
+	)
+	_ = singleFileCmd.MarkFlagRequired(argDelArtifactUri)
 
 	singleFileCmd.Flags().String(argTenantId, "", "tenant id")
-	singleFileCmd.MarkFlagRequired(argTenantId)
+	_ = singleFileCmd.MarkFlagRequired(argTenantId)
 
 	singleFileCmd.Flags().String(argDeviceType, "", "device type")
-	singleFileCmd.MarkFlagRequired(argDeviceType)
+	_ = singleFileCmd.MarkFlagRequired(argDeviceType)
 
 	// json string of specific args: dest dir, file name
-	singleFileCmd.Flags().String(argArgs, "", "specific args in json form: {\"file\":<DESTINATION_FILE_NAME_ON_DEVICE>, \"dest_dir\":<DESTINATION_DIR_ON_DEVICE>}")
-	singleFileCmd.MarkFlagRequired(argArgs)
+	singleFileCmd.Flags().String(
+		argArgs,
+		"",
+		"specific args in json form: {\"file\":<DESTINATION_FILE_NAME_ON_DEVICE>,"+
+			" \"dest_dir\":<DESTINATION_DIR_ON_DEVICE>}",
+	)
+	_ = singleFileCmd.MarkFlagRequired(argArgs)
 
 	singleFileCmd.Flags().String(argDescription, "", "artifact description")
 }
@@ -121,7 +134,10 @@ type SingleFileCmd struct {
 
 func NewSingleFileCmd(cmd *cobra.Command, args []string) (*SingleFileCmd, error) {
 	c := &SingleFileCmd{}
-	c.init(cmd)
+
+	if err := c.init(cmd); err != nil {
+		return nil, err
+	}
 
 	if err := c.Validate(); err != nil {
 		return nil, err
