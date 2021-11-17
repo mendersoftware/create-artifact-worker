@@ -1,4 +1,4 @@
-// Copyright 2020 Northern.tech AS
+// Copyright 2021 Northern.tech AS
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -54,9 +54,10 @@ func (s *storage) Download(ctx context.Context, url, path string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
 	defer cancel()
 
-	req, err := http.NewRequest(http.MethodGet,
-		url,
-		nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
 
 	req = req.WithContext(ctx)
 
@@ -76,10 +77,12 @@ func (s *storage) Download(ctx context.Context, url, path string) error {
 			body = string(bbody)
 		}
 
-		return errors.New(fmt.Sprintf("failed to download artifact at url %s, http %d, response: \n %s",
+		return errors.New(fmt.Sprintf(
+			"failed to download artifact at url %s, http %d, response: \n %s",
 			url,
 			res.StatusCode,
-			body))
+			body,
+		))
 	}
 
 	out, err := os.Create(path)
@@ -96,9 +99,10 @@ func (s *storage) Delete(ctx context.Context, url string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
 	defer cancel()
 
-	req, err := http.NewRequest(http.MethodDelete,
-		url,
-		nil)
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
+	if err != nil {
+		return err
+	}
 
 	req = req.WithContext(ctx)
 
@@ -118,10 +122,12 @@ func (s *storage) Delete(ctx context.Context, url string) error {
 			body = string(bbody)
 		}
 
-		return errors.New(fmt.Sprintf("failed to delete artifact at url %s, http %d, response: \n %s",
+		return errors.New(fmt.Sprintf(
+			"failed to delete artifact at url %s, http %d, response: \n %s",
 			url,
 			res.StatusCode,
-			body))
+			body,
+		))
 	}
 
 	return nil

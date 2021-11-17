@@ -1,4 +1,4 @@
-// Copyright 2020 Northern.tech AS
+// Copyright 2021 Northern.tech AS
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -63,7 +63,13 @@ func NewDeployments(deplUrl string, skipSsl bool) (Deployments, error) {
 	}, nil
 }
 
-func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, tid, desc string) error {
+func (d *deployments) UploadArtifactInternal(
+	ctx context.Context,
+	fpath,
+	aid,
+	tid,
+	desc string,
+) error {
 	ctx, cancel := context.WithTimeout(ctx, timeoutSec)
 	defer cancel()
 
@@ -77,11 +83,14 @@ func (d *deployments) UploadArtifactInternal(ctx context.Context, fpath, aid, ti
 
 	writer := multipart.NewWriter(body)
 
-	writer.WriteField("id", tid)
-	writer.WriteField("artifact_id", aid)
-	writer.WriteField("description", desc)
+	_ = writer.WriteField("id", tid)
+	_ = writer.WriteField("artifact_id", aid)
+	_ = writer.WriteField("description", desc)
 
 	part, err := writer.CreateFormFile("artifact", filepath.Base(fpath))
+	if err != nil {
+		return errors.Wrap(err, "cannot create artifact upload request")
+	}
 
 	_, err = io.Copy(part, artifact)
 	if err != nil {
@@ -133,7 +142,10 @@ func apiErr(r *http.Response) error {
 
 	err := json.NewDecoder(r.Body).Decode(&e)
 	if err != nil {
-		return errors.New(fmt.Sprintf("got error code %d from api but failed to decode response", r.StatusCode))
+		return errors.New(fmt.Sprintf(
+			"got error code %d from api but failed to decode response",
+			r.StatusCode,
+		))
 	}
 
 	return errors.New(fmt.Sprintf("http %d, reqid: %s, msg: %s", r.StatusCode, e.Reqid, e.Msg))
