@@ -6,7 +6,7 @@ RUN mkdir -p /go/src/github.com/mendersoftware/create-artifact-worker
 COPY . /go/src/github.com/mendersoftware/create-artifact-worker
 RUN cd /go/src/github.com/mendersoftware/create-artifact-worker && env CGO_ENABLED=1 go build -o create-artifact
 
-FROM  mendersoftware/workflows:master
+FROM mendersoftware/workflows:master
 RUN apk add --no-cache \ 
     ca-certificates \
     xz \
@@ -38,4 +38,4 @@ COPY ./workflows/generate_artifact.json /etc/workflows/definitions/generate_arti
 
 COPY ./config.yaml /etc/workflows
 COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin
-ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker", "--workflows", "generate_artifact"]
+ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker"]

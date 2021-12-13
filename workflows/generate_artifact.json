@@ -1,7 +1,8 @@
 {
     "name": "generate_artifact",
+    "topic": "generate_artifact",
     "description": "Runs a single CLI command -- An invocation of the create_artifact CLI",
-    "version": 1,
+    "version": 2,
     "tasks": [
         {
             "name": "Run create_artifact CLI",
