@@ -1,10 +1,10 @@
-FROM golang:1.16.5-alpine3.12 as builder
+FROM golang:1.17.8-alpine3.15 as builder
 RUN apk add --no-cache \
     musl-dev \
     gcc
-RUN mkdir -p /go/src/github.com/mendersoftware/create-artifact-worker
-COPY . /go/src/github.com/mendersoftware/create-artifact-worker
-RUN cd /go/src/github.com/mendersoftware/create-artifact-worker && env CGO_ENABLED=1 go build -o create-artifact
+WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
+COPY ./ .
+RUN env CGO_ENABLED=1 go build -o create-artifact
 
 FROM mendersoftware/workflows:master
 RUN apk add --no-cache \ 
