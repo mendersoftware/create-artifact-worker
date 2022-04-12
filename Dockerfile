@@ -6,7 +6,7 @@ RUN mkdir -p /go/src/github.com/mendersoftware/create-artifact-worker
 COPY . /go/src/github.com/mendersoftware/create-artifact-worker
 RUN cd /go/src/github.com/mendersoftware/create-artifact-worker && env CGO_ENABLED=1 go build -o create-artifact
 
-FROM mendersoftware/workflows:master
+FROM mendersoftware/workflows:mender-3.2
 RUN apk add --no-cache \ 
     ca-certificates \
     xz \
@@ -26,7 +26,7 @@ RUN apk add --no-cache \
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
 
-RUN wget https://downloads.mender.io/mender-artifact/3.6.1/linux/mender-artifact -O /usr/bin/mender-artifact
+RUN wget https://downloads.mender.io/mender-artifact/3.7.0/linux/mender-artifact -O /usr/bin/mender-artifact
 RUN chmod +x /usr/bin/mender-artifact
 
 RUN mkdir -p /usr/share/mender/modules/v3 && wget -N -P /usr/share/mender/modules/v3 https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file
