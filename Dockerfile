@@ -1,7 +1,8 @@
-FROM golang:1.17.8-alpine3.15 as builder
+FROM golang:1.18.1-alpine3.15 as builder
 RUN apk add --no-cache \
     musl-dev \
-    gcc
+    gcc \
+    git
 WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
 COPY ./ .
 RUN env CGO_ENABLED=1 go build -o create-artifact
