@@ -24,6 +24,7 @@ b8514c577c1c4b46cee454d5a882b15fa411e72c5bd7f801f241591789fce61a  vendor/github.
 # MIT
 22adc4abdece712a737573672f082fd61ac2b21df878efb87ffcff4354a07f26  vendor/github.com/mitchellh/mapstructure/LICENSE
 87d700d1dfac26ddcecc73971b854b5d00c4734214fb8252961212f9e06d2388  vendor/github.com/pelletier/go-toml/LICENSE
+9e4dbe82b0c7923556c9afa57f3d86e3ebd4807b7a382e60c52255f02918094c  vendor/github.com/pelletier/go-toml/v2/LICENSE
 feb6d17a0e7a64e5ab0f7e2b0e0ee3e69c1a6396626fd554dc0cddaa06851b44  vendor/github.com/spf13/cast/LICENSE
 feb6d17a0e7a64e5ab0f7e2b0e0ee3e69c1a6396626fd554dc0cddaa06851b44  vendor/github.com/spf13/jwalterweatherman/LICENSE
 feb6d17a0e7a64e5ab0f7e2b0e0ee3e69c1a6396626fd554dc0cddaa06851b44  vendor/github.com/spf13/viper/LICENSE
