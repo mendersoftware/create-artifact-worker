@@ -32,13 +32,14 @@ RUN apk add --no-cache \
     # bmap-tools not found
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
-ADD https://downloads.mender.io/mender-artifact/$MENDER_ARTIFACT_VERSION/linux/mender-artifact /usr/bin/mender-artifact
-ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file /usr/share/mender/modules/v3/single-file
-ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen /usr/bin/single-file-artifact-gen
+USER 65534
+ADD --chown=nobody https://downloads.mender.io/mender-artifact/$MENDER_ARTIFACT_VERSION/linux/mender-artifact /usr/bin/mender-artifact
+ADD --chown=nobody https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file /usr/share/mender/modules/v3/single-file
+ADD --chown=nobody https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen /usr/bin/single-file-artifact-gen
 RUN chmod +x /usr/bin/mender-artifact /usr/bin/single-file-artifact-gen
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY ./workflows/generate_artifact.json /etc/workflows/definitions/generate_artifact.json
-COPY ./config.yaml /etc/workflows/config.yaml
-COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin/
-COPY --from=workflows /usr/bin/workflows /usr/bin/
+COPY --from=builder --chown=nobody /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --chown=nobody ./workflows/generate_artifact.json /etc/workflows/definitions/generate_artifact.json
+COPY --chown=nobody ./config.yaml /etc/workflows/config.yaml
+COPY --from=builder --chown=nobody /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin/
+COPY --from=workflows --chown=nobody /usr/bin/workflows /usr/bin/
 ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker"]
