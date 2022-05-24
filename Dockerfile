@@ -1,15 +1,21 @@
-FROM golang:1.18.1-alpine3.15 as builder
+ARG WORKFLOWS_VERSION=master
+ARG MENDER_ARTIFACT_VERSION=3.7.1
+
+FROM golang:1.18.2-alpine3.15 as builder
 RUN apk add --no-cache \
+    ca-certificates \
     musl-dev \
     gcc \
     git
 WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
 COPY ./ .
-RUN env CGO_ENABLED=1 go build -o create-artifact
+RUN env CGO_ENABLED=0 go build -o create-artifact
 
-FROM mendersoftware/workflows:master
+FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
+
+FROM alpine:3.15.4
+ARG MENDER_ARTIFACT_VERSION
 RUN apk add --no-cache \ 
-    ca-certificates \
     xz \
     libc6-compat \
     binutils \
@@ -26,17 +32,13 @@ RUN apk add --no-cache \
     # bmap-tools not found
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
-
-RUN wget https://downloads.mender.io/mender-artifact/3.5.0/linux/mender-artifact -O /usr/bin/mender-artifact
-RUN chmod +x /usr/bin/mender-artifact
-
-RUN mkdir -p /usr/share/mender/modules/v3 && wget -N -P /usr/share/mender/modules/v3 https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file
-
-RUN wget https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen -O /usr/bin/single-file-artifact-gen
-RUN chmod +x /usr/bin/single-file-artifact-gen
-
+ADD https://downloads.mender.io/mender-artifact/$MENDER_ARTIFACT_VERSION/linux/mender-artifact /usr/bin/mender-artifact
+ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file /usr/share/mender/modules/v3/single-file
+ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen /usr/bin/single-file-artifact-gen
+RUN chmod +x /usr/bin/mender-artifact /usr/bin/single-file-artifact-gen
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY ./workflows/generate_artifact.json /etc/workflows/definitions/generate_artifact.json
-
-COPY ./config.yaml /etc/workflows
-COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin
+COPY ./config.yaml /etc/workflows/config.yaml
+COPY --from=builder /go/src/github.com/mendersoftware/create-artifact-worker/create-artifact /usr/bin/
+COPY --from=workflows /usr/bin/workflows /usr/bin/
 ENTRYPOINT ["/usr/bin/workflows", "--config", "/etc/workflows/config.yaml", "worker"]
