@@ -1,5 +1,5 @@
 ARG WORKFLOWS_VERSION=master
-ARG MENDER_ARTIFACT_VERSION=3.7.1
+ARG MENDER_ARTIFACT_VERSION=3.8.0
 
 FROM golang:1.18.3-alpine3.15 as builder
 RUN apk add --no-cache \
