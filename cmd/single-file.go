@@ -1,4 +1,4 @@
-// Copyright 2021 Northern.tech AS
+// Copyright 2022 Northern.tech AS
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -45,8 +45,11 @@ const (
 )
 
 type args struct {
-	Filename string `json:"filename"`
-	DestDir  string `json:"dest_dir"`
+	Filename           string `json:"filename"`
+	DestDir            string `json:"dest_dir"`
+	SoftwareFilesystem string `json:"software_filesystem"`
+	SoftwareName       string `json:"software_name"`
+	SoftwareVersion    string `json:"software_version"`
 }
 
 var singleFileCmd = &cobra.Command{
@@ -106,7 +109,10 @@ func init() {
 		argArgs,
 		"",
 		"specific args in json form: {\"file\":<DESTINATION_FILE_NAME_ON_DEVICE>,"+
-			" \"dest_dir\":<DESTINATION_DIR_ON_DEVICE>}",
+			" \"dest_dir\":<DESTINATION_DIR_ON_DEVICE>},"+
+			" \"software_filesystem\":<SOFTWARE_FILESYSTEM>},"+
+			" \"software_name\":<SOFTWARE_NAME>},"+
+			" \"software_version\":<SOFTWARE_VERSION>}",
 	)
 	_ = singleFileCmd.MarkFlagRequired(argArgs)
 
@@ -126,10 +132,15 @@ type SingleFileCmd struct {
 	GetArtifactUri string
 	DelArtifactUri string
 	Args           string
-	FileName       string
-	DestDir        string
 	TenantId       string
 	AuthToken      string
+
+	// type-specific args
+	FileName           string
+	DestDir            string
+	SoftwareFilesystem string
+	SoftwareName       string
+	SoftwareVersion    string
 }
 
 func NewSingleFileCmd(cmd *cobra.Command, args []string) (*SingleFileCmd, error) {
@@ -224,6 +235,9 @@ func (c *SingleFileCmd) Validate() error {
 
 	c.FileName = args.Filename
 	c.DestDir = args.DestDir
+	c.SoftwareFilesystem = args.SoftwareFilesystem
+	c.SoftwareName = args.SoftwareName
+	c.SoftwareVersion = args.SoftwareVersion
 
 	if c.FileName == "" {
 		return errors.New("destination filename can't be empty")
@@ -279,9 +293,18 @@ func (c *SingleFileCmd) Run() error {
 		"-d", c.DestDir,
 		"-o", outfile,
 	}
+	if c.SoftwareFilesystem != "" {
+		args = append(args, "--software-filesystem", c.SoftwareFilesystem)
+	}
+	if c.SoftwareName != "" {
+		args = append(args, "--software-name", c.SoftwareName)
+	}
+	if c.SoftwareVersion != "" {
+		args = append(args, "--software-version", c.SoftwareVersion)
+	}
+
 	for _, deviceType := range c.DeviceTypes {
-		args = append(args, "-t")
-		args = append(args, deviceType)
+		args = append(args, "-t", deviceType)
 	}
 	args = append(args, downloadFile)
 	cmd := exec.Command("/usr/bin/single-file-artifact-gen", args...)
