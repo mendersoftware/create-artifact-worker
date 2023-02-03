@@ -18,6 +18,7 @@ ARG MENDER_ARTIFACT_VERSION
 RUN apk add --no-cache \ 
     xz \
     libc6-compat \
+    openssl1.1-compat \
     binutils \
     file \
     rsync \
