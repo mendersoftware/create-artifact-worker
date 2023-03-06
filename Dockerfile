@@ -1,5 +1,5 @@
 ARG WORKFLOWS_VERSION=master
-ARG MENDER_ARTIFACT_VERSION=3.8.0
+ARG MENDER_ARTIFACT_VERSION=3.9.0
 
 FROM golang:1.19.3-alpine3.16 as builder
 RUN apk add --no-cache \
@@ -18,6 +18,7 @@ ARG MENDER_ARTIFACT_VERSION
 RUN apk add --no-cache \ 
     xz \
     libc6-compat \
+    openssl1.1-compat \
     binutils \
     file \
     rsync \
