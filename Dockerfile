@@ -1,7 +1,7 @@
 ARG WORKFLOWS_VERSION=master
 ARG MENDER_ARTIFACT_VERSION=3.9.0
 
-FROM golang:1.19.3-alpine3.16 as builder
+FROM golang:1.20.1-alpine3.16 as builder
 RUN apk add --no-cache \
     ca-certificates \
     musl-dev \
