@@ -37,6 +37,7 @@ func Init() {
 	viper.SetDefault(CfgSkipVerify, false)
 	viper.SetDefault(CfgVerbose, false)
 	viper.SetDefault(CfgWorkDir, "/var")
+	viper.SetDefault(CfgDeploymentsUrl, "http://mender-deployments:8080")
 }
 
 func ValidUrl(s string) error {

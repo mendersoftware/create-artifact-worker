@@ -35,7 +35,7 @@ Supports the following env vars:
 	CREATE_ARTIFACT_VERBOSE          enable verbose logging (default: false).
 	CREATE_ARTIFACT_WORKDIR          Working directory where the single-file-generator is executed.
 	CREATE_ARTIFACT_SKIPVERIFY       Skip TLS hostname verification.
-	CREATE_ARTIFACT_DEPLOYMENTS_URL  URL to the deployments service.
+	CREATE_ARTIFACT_DEPLOYMENTS_URL  URL to the deployments service (default: "http://mender-deployments:8080").
 `,
 }
 
