@@ -13,7 +13,7 @@ RUN env CGO_ENABLED=0 go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 
-FROM alpine:3.18.3
+FROM alpine:3.18.4
 ARG MENDER_ARTIFACT_VERSION
 RUN apk add --no-cache \ 
     xz \
