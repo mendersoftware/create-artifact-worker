@@ -126,6 +126,7 @@ func (d *deployments) UploadArtifactInternal(
 	if err != nil {
 		return errors.Wrapf(err, "failed to upload artifact %s", aid)
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusCreated {
 		return errors.Wrapf(apiErr(res), "failed to upload artifact %s", aid)
