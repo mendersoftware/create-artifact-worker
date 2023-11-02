@@ -15,7 +15,7 @@ FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 
 FROM alpine:3.18.4
 ARG MENDER_ARTIFACT_VERSION
-RUN apk add --no-cache \ 
+RUN apk add --no-cache \
     xz \
     libc6-compat \
     openssl1.1-compat \
@@ -28,7 +28,7 @@ RUN apk add --no-cache \
     pigz \
     dosfstools \
     wget \
-    make \ 
+    make \
     bash
     # bmap-tools not found
 
