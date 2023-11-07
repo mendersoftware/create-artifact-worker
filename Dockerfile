@@ -1,7 +1,7 @@
 ARG WORKFLOWS_VERSION=master
 ARG MENDER_ARTIFACT_VERSION=3.10.1
 
-FROM golang:1.20.4-alpine3.16 as builder
+FROM golang:1.20.10-alpine3.18 as builder
 RUN apk add --no-cache \
     ca-certificates \
     musl-dev \
@@ -13,9 +13,9 @@ RUN env CGO_ENABLED=0 go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 
-FROM alpine:3.18.3
+FROM alpine:3.18.4
 ARG MENDER_ARTIFACT_VERSION
-RUN apk add --no-cache \ 
+RUN apk add --no-cache \
     xz \
     libc6-compat \
     openssl1.1-compat \
@@ -28,7 +28,7 @@ RUN apk add --no-cache \
     pigz \
     dosfstools \
     wget \
-    make \ 
+    make \
     bash
     # bmap-tools not found
 
