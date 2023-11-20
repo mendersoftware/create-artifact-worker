@@ -1,5 +1,7 @@
 variables:
   DOCKER_REPOSITORY: mendersoftware/create-artifact-worker
+  MULTIPLATFORM_BUILD: "true"
+  MULTIPLATFORM_PLATFORMS: "linux/amd64,linux/arm64"
 
 stages:
   - test_prep
@@ -20,3 +22,23 @@ include:
     file: '.gitlab-ci-check-docker-build.yml'
   - project: 'Northern.tech/Mender/mendertesting'
     file: '.gitlab-ci-github-status-updates.yml'
+
+# excludes non multiplatform build job
+build:docker:
+  rules:
+    - when: never
+
+# excludes non multiplatform build job
+publish:image:
+  rules:
+    - when: never
+
+# excludes non multiplatform build job
+publish:image:mender:
+  rules:
+    - when: never
+
+# excludes non multiplatform build job
+publish:image:saas:
+  rules:
+    - when: never
