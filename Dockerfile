@@ -1,7 +1,6 @@
 ARG WORKFLOWS_VERSION=master
-ARG MENDER_ARTIFACT_VERSION=3.10.1
-
-FROM golang:1.20.10-alpine3.18 as builder
+FROM --platform=$BUILDPLATFORM golang:1.20.10-alpine3.18 as builder
+ARG TARGETARCH
 RUN apk add --no-cache \
     ca-certificates \
     musl-dev \
@@ -9,12 +8,22 @@ RUN apk add --no-cache \
     git
 WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
 COPY ./ .
-RUN env CGO_ENABLED=0 go build -o create-artifact
+RUN env CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 
+FROM --platform=$BUILDPLATFORM alpine:3.18.4 as mender-artifact-get
+ARG TARGETARCH
+ARG MENDER_ARTIFACT_VERSION=3.10.1
+RUN apk --update --no-cache add binutils
+RUN deb_filename=mender-artifact_${MENDER_ARTIFACT_VERSION}-1%2Bdebian%2Bbullseye_${TARGETARCH}.deb && \
+    wget "https://downloads.mender.io/repos/debian/pool/main/m/mender-artifact/${deb_filename}" \
+    --output-document=/mender-artifact.deb && \
+    ar -xvf /mender-artifact.deb data.tar.xz && tar -xvf /data.tar.xz ./usr/bin/mender-artifact
+
 FROM alpine:3.18.4
 ARG MENDER_ARTIFACT_VERSION
+ARG TARGETARCH
 RUN apk add --no-cache \
     xz \
     libc6-compat \
@@ -33,7 +42,7 @@ RUN apk add --no-cache \
     # bmap-tools not found
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
-ADD https://downloads.mender.io/mender-artifact/$MENDER_ARTIFACT_VERSION/linux/mender-artifact /usr/bin/mender-artifact
+COPY --from=mender-artifact-get /usr/bin/mender-artifact /usr/bin/mender-artifact
 ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file /usr/share/mender/modules/v3/single-file
 ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen /usr/bin/single-file-artifact-gen
 RUN chmod +x /usr/bin/mender-artifact /usr/bin/single-file-artifact-gen
