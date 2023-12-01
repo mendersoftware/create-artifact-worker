@@ -12,7 +12,7 @@ RUN env CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 
-FROM --platform=$BUILDPLATFORM alpine:3.18.4 as mender-artifact-get
+FROM --platform=$BUILDPLATFORM alpine:3.18.5 as mender-artifact-get
 ARG TARGETARCH
 ARG MENDER_ARTIFACT_VERSION=3.10.1
 RUN apk --update --no-cache add binutils
@@ -21,7 +21,7 @@ RUN deb_filename=mender-artifact_${MENDER_ARTIFACT_VERSION}-1%2Bdebian%2Bbullsey
     --output-document=/mender-artifact.deb && \
     ar -xvf /mender-artifact.deb data.tar.xz && tar -xvf /data.tar.xz ./usr/bin/mender-artifact
 
-FROM alpine:3.18.4
+FROM alpine:3.18.5
 ARG MENDER_ARTIFACT_VERSION
 ARG TARGETARCH
 RUN apk add --no-cache \
