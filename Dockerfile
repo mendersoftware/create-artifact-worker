@@ -27,7 +27,6 @@ ARG TARGETARCH
 RUN apk add --no-cache \
     xz \
     libc6-compat \
-    openssl1.1-compat \
     binutils \
     file \
     rsync \
@@ -40,6 +39,9 @@ RUN apk add --no-cache \
     make \
     bash
     # bmap-tools not found
+
+RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+    openssl1.1-compat
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
 COPY --from=mender-artifact-get /usr/bin/mender-artifact /usr/bin/mender-artifact
