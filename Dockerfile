@@ -15,11 +15,10 @@ FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 FROM --platform=$BUILDPLATFORM alpine:3.18.4 as mender-artifact-get
 ARG TARGETARCH
 ARG MENDER_ARTIFACT_VERSION=3.10.1
-RUN apk --update --no-cache add binutils
+RUN apk --update --no-cache add dpkg
 RUN deb_filename=mender-artifact_${MENDER_ARTIFACT_VERSION}-1%2Bdebian%2Bbullseye_${TARGETARCH}.deb && \
     wget "https://downloads.mender.io/repos/debian/pool/main/m/mender-artifact/${deb_filename}" \
-    --output-document=/mender-artifact.deb && \
-    ar -xvf /mender-artifact.deb data.tar.xz && tar -xvf /data.tar.xz ./usr/bin/mender-artifact
+    --output-document=/mender-artifact.deb && dpkg-deb --extract /mender-artifact.deb /
 
 FROM alpine:3.18.4
 ARG MENDER_ARTIFACT_VERSION
