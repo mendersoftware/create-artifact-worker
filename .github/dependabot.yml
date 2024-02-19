@@ -6,7 +6,10 @@ updates:
     package-ecosystem: gomod
     schedule:
       interval: monthly
-      day: saturday
+    groups:
+      golang-dependencies:
+        patterns:
+          - "*"
     reviewers:
       - "mendersoftware/backend-dependabot-reviewers"
   - commit-message:
@@ -15,10 +18,9 @@ updates:
     package-ecosystem: docker
     schedule:
       interval: monthly
-      day: saturday
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
     reviewers:
       - "mendersoftware/backend-dependabot-reviewers"
-    # Ignore Alpine 3.19: https://northerntech.atlassian.net/browse/QA-643
-    ignore:
-      - dependency-name: "docker.io/alpine"
-        update-types: ["version-update:semver-major"]
