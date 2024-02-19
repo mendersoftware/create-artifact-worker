@@ -15,8 +15,8 @@ FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 FROM --platform=$BUILDPLATFORM alpine:3.19.1 as mender-artifact-get
 ARG TARGETARCH
 ARG MENDER_ARTIFACT_VERSION=3.10.1
-RUN apk --update --no-cache add dpkg
-RUN deb_filename=mender-artifact_${MENDER_ARTIFACT_VERSION}-1%2Bdebian%2Bbullseye_${TARGETARCH}.deb && \
+RUN apk --update --no-cache add dpkg zstd
+RUN deb_filename=mender-artifact_${MENDER_ARTIFACT_VERSION}-1%2Bubuntu%2Bjammy_${TARGETARCH}.deb && \
     wget "https://downloads.mender.io/repos/debian/pool/main/m/mender-artifact/${deb_filename}" \
     --output-document=/mender-artifact.deb && dpkg-deb --extract /mender-artifact.deb /
 
@@ -26,7 +26,6 @@ ARG TARGETARCH
 RUN apk add --no-cache \
     xz \
     libc6-compat \
-    openssl1.1-compat \
     binutils \
     file \
     rsync \
