@@ -1,5 +1,5 @@
 ARG WORKFLOWS_VERSION=master
-FROM --platform=$BUILDPLATFORM golang:1.21.6-alpine3.18 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22.0-alpine3.18 as builder
 ARG TARGETARCH
 RUN apk add --no-cache \
     ca-certificates \
