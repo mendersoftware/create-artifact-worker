@@ -1,5 +1,5 @@
 ARG WORKFLOWS_VERSION=master
-FROM --platform=$BUILDPLATFORM golang:1.22.3-alpine3.19 as builder
+FROM --platform=$BUILDPLATFORM golang:1.22.4-alpine3.19 as builder
 ARG TARGETARCH
 RUN apk add --no-cache \
     ca-certificates \
@@ -12,7 +12,7 @@ RUN env CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
 
-FROM --platform=$BUILDPLATFORM alpine:3.20.0 as mender-artifact-get
+FROM --platform=$BUILDPLATFORM alpine:3.20.1 as mender-artifact-get
 ARG TARGETARCH
 ARG MENDER_ARTIFACT_VERSION=3.11.2
 RUN apk --update --no-cache add dpkg zstd
@@ -20,7 +20,7 @@ RUN deb_filename=mender-artifact_${MENDER_ARTIFACT_VERSION}-1%2Bubuntu%2Bjammy_$
     wget "https://downloads.mender.io/repos/debian/pool/main/m/mender-artifact/${deb_filename}" \
     --output-document=/mender-artifact.deb && dpkg-deb --extract /mender-artifact.deb /
 
-FROM alpine:3.20.0
+FROM alpine:3.20.1
 ARG MENDER_ARTIFACT_VERSION
 ARG TARGETARCH
 RUN apk add --no-cache \
