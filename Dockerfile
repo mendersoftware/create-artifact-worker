@@ -43,7 +43,6 @@ RUN apk add --no-cache \
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
 COPY --from=mender-artifact-get /usr/bin/mender-artifact /usr/bin/mender-artifact
-ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules/single-file /usr/share/mender/modules/v3/single-file
 ADD https://raw.githubusercontent.com/mendersoftware/mender/master/support/modules-artifact-gen/single-file-artifact-gen /usr/bin/single-file-artifact-gen
 RUN chmod +x /usr/bin/mender-artifact /usr/bin/single-file-artifact-gen
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
