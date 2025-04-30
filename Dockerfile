@@ -1,5 +1,5 @@
 ARG WORKFLOWS_VERSION=master
-FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 as builder
+FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 AS builder
 ARG TARGETARCH
 RUN apk add --no-cache \
     ca-certificates \
@@ -10,9 +10,9 @@ WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
 COPY ./ .
 RUN env CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o create-artifact
 
-FROM mendersoftware/workflows:$WORKFLOWS_VERSION as workflows
+FROM mendersoftware/workflows:$WORKFLOWS_VERSION AS workflows
 
-FROM --platform=$BUILDPLATFORM alpine:3.18.4 as mender-artifact-get
+FROM --platform=$BUILDPLATFORM alpine:3.18.4 AS mender-artifact-get
 ARG TARGETARCH
 ARG MENDER_ARTIFACT_VERSION=3.10.1
 RUN apk --update --no-cache add binutils
