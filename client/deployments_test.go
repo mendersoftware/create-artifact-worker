@@ -17,7 +17,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -82,7 +82,7 @@ func TestDeploymentsUploadArtifactInternal(t *testing.T) {
 
 			ctx := context.TODO()
 
-			tmp, err := ioutil.TempFile(".", tc.fname)
+			tmp, err := os.CreateTemp(".", tc.fname)
 			assert.NoError(t, err)
 
 			content := []byte("foobar")
@@ -114,7 +114,7 @@ func TestDeploymentsUploadArtifactInternal(t *testing.T) {
 				f, fh, err := req.FormFile("artifact")
 				assert.NoError(t, err)
 				assert.True(t, strings.HasPrefix(fh.Filename, tc.fname))
-				b, err := ioutil.ReadAll(f)
+				b, err := io.ReadAll(f)
 				assert.NoError(t, err)
 
 				rw.WriteHeader(tc.code)
