@@ -1,21 +1,15 @@
 ARG WORKFLOWS_VERSION=master
-FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 AS builder-create-artifact-worker
+FROM --platform=$BUILDPLATFORM golang:1.24.3 AS builder-create-artifact-worker
 ARG TARGETARCH
-RUN apk add --no-cache \
-    ca-certificates \
-    musl-dev \
-    gcc \
-    git
 WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
 COPY ./ .
 RUN env CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION AS workflows
 
-FROM --platform=$BUILDPLATFORM golang:1.24.2-alpine3.21 AS builder-mender-artifact
+FROM --platform=$BUILDPLATFORM golang:1.24.3 AS builder-mender-artifact
 ARG MENDER_ARTIFACT_VERSION=4.1.0
 ARG TARGETARCH
-RUN apk add --no-cache git
 RUN git clone \
     --depth 1 \
     --branch $MENDER_ARTIFACT_VERSION \
