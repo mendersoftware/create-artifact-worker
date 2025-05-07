@@ -22,7 +22,7 @@ RUN env CGO_ENABLED=0 GOARCH=${TARGETARCH} \
     -ldflags "-X github.com/mendersoftware/mender-artifact/cli.Version=${MENDER_ARTIFACT_VERSION}" \
     -o mender-artifact
 
-FROM alpine:3.18.4
+FROM alpine:3.18.12
 RUN apk add --no-cache \
     xz \
     libc6-compat \
@@ -38,7 +38,6 @@ RUN apk add --no-cache \
     wget \
     make \
     bash
-    # bmap-tools not found
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
 COPY --from=builder-mender-artifact /go/src/github.com/mendersoftware/mender-artifact/mender-artifact /usr/bin/
