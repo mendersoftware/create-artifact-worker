@@ -1,21 +1,15 @@
 ARG WORKFLOWS_VERSION=master
-FROM --platform=$BUILDPLATFORM golang:1.21.4-alpine3.18 AS builder-create-artifact-worker
+FROM --platform=$BUILDPLATFORM golang:1.24.3 AS builder-create-artifact-worker
 ARG TARGETARCH
-RUN apk add --no-cache \
-    ca-certificates \
-    musl-dev \
-    gcc \
-    git
 WORKDIR /go/src/github.com/mendersoftware/create-artifact-worker
 COPY ./ .
 RUN env CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o create-artifact
 
 FROM mendersoftware/workflows:$WORKFLOWS_VERSION AS workflows
 
-FROM --platform=$BUILDPLATFORM golang:1.24.2-alpine3.21 AS builder-mender-artifact
+FROM --platform=$BUILDPLATFORM golang:1.24.3 AS builder-mender-artifact
 ARG MENDER_ARTIFACT_VERSION=4.1.0
 ARG TARGETARCH
-RUN apk add --no-cache git
 RUN git clone \
     --depth 1 \
     --branch $MENDER_ARTIFACT_VERSION \
@@ -28,7 +22,7 @@ RUN env CGO_ENABLED=0 GOARCH=${TARGETARCH} \
     -ldflags "-X github.com/mendersoftware/mender-artifact/cli.Version=${MENDER_ARTIFACT_VERSION}" \
     -o mender-artifact
 
-FROM alpine:3.18.4
+FROM alpine:3.18.12
 RUN apk add --no-cache \
     xz \
     libc6-compat \
@@ -44,7 +38,6 @@ RUN apk add --no-cache \
     wget \
     make \
     bash
-    # bmap-tools not found
 
 RUN sed -i 's/ash/bash/g' /etc/passwd
 COPY --from=builder-mender-artifact /go/src/github.com/mendersoftware/mender-artifact/mender-artifact /usr/bin/
